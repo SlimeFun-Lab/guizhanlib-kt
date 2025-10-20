@@ -18,8 +18,7 @@ allprojects {
     repositories {
         mavenCentral()
         maven("https://jitpack.io/")
-        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-        maven("https://repo.papermc.io/repository/maven-public/")
+        maven(url = "https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.alessiodp.com/releases/")
     }
 }
@@ -45,14 +44,16 @@ subprojects {
 
     java {
         disableAutoTargetJvm()
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
     }
 
     kotlin {
+        jvmToolchain(21)
         compilerOptions {
             javaParameters = true
-            jvmTarget = JvmTarget.JVM_17
+            jvmTarget = JvmTarget.JVM_21
         }
     }
 
@@ -136,8 +137,18 @@ subprojects {
     }
 
     signing {
-        sign(publishing.publications["maven"])
+        setRequired { false }
+
+        val key  = System.getenv("SIGNING_KEY") ?: findProperty("signing.key") as String?
+        val pass = System.getenv("SIGNING_PASSWORD") ?: findProperty("signing.password") as String?
+
+        if (!key.isNullOrBlank() && !pass.isNullOrBlank()) {
+            useInMemoryPgpKeys(key, pass)
+            sign(publishing.publications["maven"])
+            setRequired { true }
+        }
     }
+
 }
 
 nexusPublishing {
