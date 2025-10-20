@@ -61,6 +61,11 @@ subprojects {
         useJUnitPlatform()
     }
 
+    tasks.withType<GenerateModuleMetadata>().configureEach {
+        dependsOn(tasks.named("jar"))
+        dependsOn(tasks.named("shadowJar"))
+    }
+
     val sourcesJar by tasks.creating(Jar::class) {
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
