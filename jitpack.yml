@@ -1,0 +1,5 @@
+jdk:
+    - openjdk21
+
+install:
+    - ./gradlew :guizhanlib-kt-all:clean :guizhanlib-kt-all:build :guizhanlib-kt-all:publishToMavenLocal
